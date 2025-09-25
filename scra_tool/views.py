@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from .models import *
 import re
+import traceback
 
 # Utility to safely get text
 def safe_get_text(tag, default="N/A"):
@@ -56,7 +57,8 @@ def scrape_flipkart_json(request):
         except Exception as e:
             results.append({
                 "error": f"Failed to scrape product: {url}",
-                "details": str(e)
+                "details": str(e),
+                "trace": traceback.format_exc()
             })
 
     return JsonResponse({"query": query, "count": len(results), "products": results}, safe=False)
@@ -70,7 +72,8 @@ def scrape_product_details(url):
         raise Exception(f"Failed to load product page: {e}")
 
     soup = BeautifulSoup(response.content, "html.parser")
-
+    
+    coupons = [safe_get_text(li) for li in soup.select("div.I+EQVr")]
     # Bank offers
     bank_offers = [safe_get_text(li) for li in soup.select("div.NYb6Oz li.kF1Ml8.col")]
 
@@ -260,8 +263,8 @@ def scrape_product_details(url):
     }
 
     # Image
-    main_image = soup.select_one("img.DByuf4")
-    image_url = main_image["src"] if main_image else None
+    img_tags = soup.find_all("img", class_="_0DkuPH")
+    image_url = [img["src"] for img in img_tags if img.get("src")]
 
     #---------------------------------------- question answer ------------------------------------------------------
     qa_blocks = soup.find_all('div', class_='BZMA+t')
@@ -295,6 +298,7 @@ def scrape_product_details(url):
         "offer": safe_get_text(soup.select_one("div.UkUFwK.WW8yVX")),
         "protect_info": protect_info,
         "ratings_reviews": final_data,
+        "coupons": coupons,
         "bank_offers": bank_offers,
         "purchase_options": purchase_options,
         "color_options": colors,
@@ -312,5 +316,6 @@ def scrape_product_details(url):
         "image_url": image_url,
         "product_url": url
     }
+    
     # Product.objects.create(**product_data)
     return product_data
