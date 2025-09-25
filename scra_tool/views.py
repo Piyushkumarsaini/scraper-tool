@@ -98,10 +98,30 @@ def scrape_product_details(url):
     "protect_promise_fee": safe_get_text(soup.select_one('.QLGtsq span')),
     "delivery_text": safe_get_text(soup.select_one('.yiggsN'))
     }
+# ------------------------------------------------------------- Ram ----------------------------------------------------------------------
+    # RAM options for phone
+    phone_ram_options = []
+    for li in soup.select("li.aJWdJI[id$='-ram']"):
+        a_tag = li.select_one("a")
+        phone_ram_options.append({
+            "ram_text": safe_get_text(li.select_one("div.V3Zflw")),
+            "link": "https://www.flipkart.com" + a_tag["href"] if a_tag and a_tag.has_attr("href") else None
+        })
 
-    # RAM options
-    rams = [safe_get_text(li.select_one("div.V3Zflw")) for li in soup.select("li.aJWdJI[id$='-ram']")]
+    # RAM options for laptop
+    laptop_ram_options = []
+    for li in soup.select("li.aJWdJI[id*='system_memory']"):
+        a_tag = li.select_one("a")
+        laptop_ram_options.append({
+            "ram_text": safe_get_text(li.select_one("div.V3Zflw")),
+            "link": "https://www.flipkart.com" + a_tag["href"] if a_tag and a_tag.has_attr("href") else None
+        })
 
+    # Prefer phone RAM, fallback to laptop RAM
+    ram_options = phone_ram_options if phone_ram_options else laptop_ram_options
+
+        
+    
     # Color options
     colors = []
     for li in soup.select("li.aJWdJI[id$='-color']"):
@@ -120,8 +140,8 @@ def scrape_product_details(url):
             "link": "https://www.flipkart.com" + li.select_one("a")["href"] if li.select_one("a") else None
         }
         storages.append(storage)
-
-
+        
+# ----------------------------------------------------------------- purchase options -------------------------------------------------------
     # Purchase options
     purchase_options = []
     purchase_div = soup.find("div", class_="BRgXml")
@@ -306,7 +326,7 @@ def scrape_product_details(url):
         "delivery_date": delivery_date,
         "delivery_note": delivery_note,
         "payment_offers": payments,
-        "ram_options": rams,
+        "ram_options": ram_options,
         "highlight_items": [safe_get_text(li) for li in soup.select('.U\\+9u4y ._7eSDEz')],
         "seller_info": seller,
         "description": safe_get_text(soup.select_one('div._4gvKMe')),
@@ -317,5 +337,7 @@ def scrape_product_details(url):
         "product_url": url
     }
     
+    a = soup.find_all('div', class_= 'WGBwfw')
+    # print(a)
     # Product.objects.create(**product_data)
     return product_data
