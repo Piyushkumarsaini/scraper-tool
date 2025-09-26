@@ -79,6 +79,8 @@ def scrape_product_details(url):
 
     # Payment offers
     payments = [safe_get_text(li) for li in soup.select("div.HQijVm li.g11wDd")]
+    services = [safe_get_text(item) for item in soup.select('.C3EUFP li .YhUgfO')]
+    pay__servi = payments if payments else services
 
     # Delivery info
     delivery_div = soup.select_one("div.nRBH83")
@@ -120,7 +122,7 @@ def scrape_product_details(url):
     # Prefer phone RAM, fallback to laptop RAM
     ram_options = phone_ram_options if phone_ram_options else laptop_ram_options
 
-        
+#  ======================================================================================================================       
     
     # Color options
     colors = []
@@ -191,7 +193,10 @@ def scrape_product_details(url):
 # -------------------- RATING & REVIEW BLOCK --------------------
 
     # -------------------- Overall Rating Block --------------------
+     
     rating_block = soup.select_one('div.col-4-12')
+    if not rating_block:
+        return None
     overall_rating = safe_get_text(rating_block.select_one('div.ipqd2A'))
     star_icon = safe_get_text(rating_block.select_one('div.u12NqW'))
     ratings_count = rating_block.select('div.row.j-aW8Z span')
@@ -325,7 +330,7 @@ def scrape_product_details(url):
         "storag_options": storages,
         "delivery_date": delivery_date,
         "delivery_note": delivery_note,
-        "payment_offers": payments,
+        "payment_offers": pay__servi,
         "ram_options": ram_options,
         "highlight_items": [safe_get_text(li) for li in soup.select('.U\\+9u4y ._7eSDEz')],
         "seller_info": seller,
@@ -336,8 +341,10 @@ def scrape_product_details(url):
         "image_url": image_url,
         "product_url": url
     }
-    
-    a = soup.find_all('div', class_= 'WGBwfw')
+    # a = {
+    # "support_items": [
+    #     safe_get_text(item) for item in soup.select('.C3EUFP li .YhUgfO')
+    # ]}
     # print(a)
     # Product.objects.create(**product_data)
     return product_data
