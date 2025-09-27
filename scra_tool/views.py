@@ -55,38 +55,113 @@ def scrape_flipkart_json(request):
     if request.method != "GET":
         return JsonResponse({"error": "Only GET method allowed."}, status=405)
 
-    query = request.GET.get("q")
-    if not query:
-        return JsonResponse({"error": "Missing product query (?q=...)"}, status=400)
+    # query = request.GET.get("q")
+    # if not query:
+    #     return JsonResponse({"error": "Missing product query (?q=...)"}, status=400)
 
-    search_url = f"https://www.flipkart.com/search?q={query}"
-    try:
-        response = requests.get(search_url, headers=HEADERS, timeout=10)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({"error": "Failed to fetch search page", "details": str(e)}, status=500)
+    keywords = [
+        "Headphone",
+        "Headsets",
+        "Powerbanks",
+        "Mobile Cables",
+        "Smart Watches",
+        "Smart Bands",
+        "Gaming Laptops",
+        "Televisions",
+        "Mobile Cases",
+        "Smart Headphones",
+        "Apple iPads",
+        "Printers",
+        "Mouse",
+        "Mobile Holders",
+        "Screen Guards",
+        "Memory Cards",
+        "Mobile Chargers",
+        "Smart Glasses (VR)",
+        "Weighing Scale",
+        "Accessories",
+        "External Hard Disks",
+        "Pendrives",
+        "Laptop Bags",
+        "Laptop Skins & Decals",
+        "Monitors",
+        "Routers",
+        "Desktop PCs",
+        "Lens",
+        "BP Monitors",
+        "Tripods",
+        "Google Nest"
+        ]
 
-    product_urls = extract_product_urls(response.text)
-    if not product_urls:
-        return JsonResponse({"message": "No products found."})
-
-    # Scrape only the first product for demo
-    results = []
-    for url in product_urls[:1]:
+    # for query in keywords:
+    #     search_url = f"https://www.flipkart.com/search?q={query}"
+    #     try:
+    #         response = requests.get(search_url, headers=HEADERS, timeout=10)
+    #         response.raise_for_status()
+    #     except requests.RequestException as e:
+    #         return JsonResponse({"error": "Failed to fetch search page", "details": str(e)}, status=500)
+    final_results = []
+    for query in keywords:
+        search_url = f"https://www.flipkart.com/search?q={query}"
         try:
-            product_data = scrape_product_details(url)
-            results.append(product_data)
-        except Exception as e:
-            results.append({
-                "error": f"Failed to scrape product: {url}",
-                "details": str(e),
-                "trace": traceback.format_exc()
+            response = requests.get(search_url, headers=HEADERS)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            final_results.append({
+                "query": query,
+                "error": "Failed to fetch search page",
+                "details": str(e)
             })
-    return JsonResponse({"query": query, "count": len(results), "products": results}, safe=False)
+            continue
+
+        # product_urls = extract_product_urls(response.text)
+        # if not product_urls:
+        #     return JsonResponse({"message": "No products found."})
+        product_urls = extract_product_urls(response.text)
+        if not product_urls:
+            final_results.append({
+                "query": query,
+                "message": "No products found."
+            })
+            continue
+        
+        # Scrape only the first product for demo
+        # results = []
+        # for url in product_urls[:1]:
+        #     try:
+        #         product_data = scrape_product_details(url)
+        #         results.append(product_data)
+        #     except Exception as e:
+        #         results.append({
+        #             "error": f"Failed to scrape product: {url}",
+        #             "details": str(e),
+        #             "trace": traceback.format_exc()
+        #         })
+        # return JsonResponse({"query": query, "count": len(results), "products": results}, safe=False)
+        
+        products = []
+        for url in product_urls[:1]:
+            try:
+                product_data = scrape_product_details(url)
+                products.append(product_data)
+            except Exception as e:
+                products.append({
+                    "error": f"Failed to scrape product: {url}",
+                    "details": str(e),
+                    "trace": traceback.format_exc()
+                })
+
+        final_results.append({
+            "query": query,
+            "count": len(products),
+            "products": products
+        })
+
+    return JsonResponse(final_results, safe=False)
 
 def scrape_product_details(url):
     try:
-        response = requests.get(url, headers=HEADERS, timeout=10)
+        response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
     except requests.RequestException as e:
         raise Exception(f"Failed to load product page: {e}")
@@ -324,6 +399,7 @@ def scrape_product_details(url):
         "ratings_reviews": {
             "overall": {"rating": overall_rating, "star_icon": star_icon, "ratings_text": ratings_text, "reviews_text": reviews_text},
             "distribution": rating_distribution,
+            "feature_ratings": feature_ratings,
             "reviews": all_reviews
         },
         "coupons": [c for c in coupons if c],
@@ -336,10 +412,19 @@ def scrape_product_details(url):
         "payment_offers": payment_offers,
         "ram_options": ram_options,
         "seller_info": seller,
+        "product_description": product_description,
         "specifications": specifications,
         "question_answer": qa_list,
         "image_url": image_url,
         "product_url": url
     }
-    # product_data = dict_remove_empty(product_datas)
-    return product_datas
+    product_data = dict_remove_empty(product_datas)
+    # Product.objects.update_or_create(**product_datas)
+
+    # This will update if product_url exists, otherwise create a new one
+    Product.objects.update_or_create(
+        product_url=product_data.get("product_url"),
+        defaults=product_data
+    )
+
+    return product_data
