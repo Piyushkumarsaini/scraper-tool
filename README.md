@@ -1,26 +1,33 @@
-🛒 Flipkart Scraper Tool (Django)
-A Django-based backend project for scraping product data from Flipkart.It fetches product details such as name, price, offers, ratings, reviews, seller info, specifications, images, Q&A, and more.The data is stored in the database using Django models and can also be returned as JSON via an API endpoint.
+# 🛒 Flipkart Scraper Tool (Django)
 
-🚀 Features
+A Django-based backend project for scraping product data from **Flipkart**.  
+It fetches product details such as name, price, offers, ratings, reviews, seller info, specifications, images, Q&A, and more.  
+The data is stored in the database using Django models and can also be returned as JSON via an API endpoint.
 
-Scrapes detailed product information:
-Name, Price, MRP, Offers
-Coupons & Bank Offers
-Delivery details
-Seller info
-RAM, Color, Storage, Purchase options
-Ratings & Review blocks (with distribution + feature-wise ratings)
-Product specifications
-Product description (with images)
-Q&A section
-Product images
+---
 
+## 🚀 Features
 
-Saves scraped data into the database (Product model).
-Provides JSON API endpoint for scraping.
+- Scrapes detailed product information:
+  - Name, Price, MRP, Offers
+  - Coupons & Bank Offers
+  - Delivery details
+  - Seller info
+  - RAM, Color, Storage, Purchase options
+  - Ratings & Review blocks (with distribution + feature-wise ratings)
+  - Product specifications
+  - Product description (with images)
+  - Q&A section
+  - Product images
+- Saves scraped data into the database (`Product` model).
+- Provides JSON API endpoint for scraping.
 
+---
 
-📂 Project Structure
+## 📂 Project Structure
+
+```
+
 scraper-tool/
 ├── manage.py
 ├── requirements.txt
@@ -31,52 +38,67 @@ scraper-tool/
 │   └── ...
 └── README.md
 
+````
 
-🛠 Requirements
+---
 
-Python 3.9+
-Django 4.x+
-Libraries:
-requests
-beautifulsoup4
+## 🛠 Requirements
 
+- **Python 3.9+**  
+- **Django 4.x+**  
+- Libraries:
+  - `requests`
+  - `beautifulsoup4`
 
+---
 
-
-⚙️ Setup
+## ⚙️ Setup
 
 Clone the repository:
+
+```bash
 git clone https://github.com/Piyushkumarsaini/scraper-tool.git
 cd scraper-tool
-
+````
 
 Install dependencies:
-pip install -r requirements.txt
 
+```bash
+pip install -r requirements.txt
+```
 
 Apply migrations:
+
+```bash
 python manage.py makemigrations
 python manage.py migrate
-
+```
 
 Run the server:
+
+```bash
 python manage.py runserver
+```
 
+---
 
+## 📊 How It Works
 
-
-📊 How It Works
 The scraper loops over a predefined list of Flipkart keywords (e.g., Headphones, Powerbanks, Smart Watches).
+
 For each keyword:
 
-Fetches Flipkart search results.
-Extracts the first product link.
-Scrapes product details.
-Saves product data in the database.
-Returns structured JSON.
+1. Fetches Flipkart search results.
+2. Extracts the first product link.
+3. Scrapes product details.
+4. Saves product data in the database.
+5. Returns structured JSON.
 
+---
 
-📦 Example API Response
+## 📦 Example API Response
+
+```json
 [
   {
     "query": "Headphone",
@@ -107,45 +129,48 @@ Returns structured JSON.
     ]
   }
 ]
+```
 
+---
 
-🗄 Database (Product Model)
-The scraped product is saved in the Product model with fields such as:
+## 🗄 Database (Product Model)
 
-name, price, mrp, offer, extra_off
-seller_info, ratings_reviews, coupons, bank_offers
-product_description, specifications, question_answer
-image_url, product_url
+The scraped product is saved in the **Product** model with fields such as:
 
+* `name`, `price`, `mrp`, `offer`, `extra_off`
+* `seller_info`, `ratings_reviews`, `coupons`, `bank_offers`
+* `product_description`, `specifications`, `question_answer`
+* `image_url`, `product_url`
 
-🧩 Notes
+---
 
-Currently scrapes only the first product per keyword (demo mode).You can change this in views.py:
-for url in product_urls[:1]:
+## 🧩 Notes
 
-Increase the range to scrape more products.
+* Currently scrapes only **the first product per keyword** (demo mode).
+  You can change this in `views.py`:
 
-Flipkart changes its frontend structure often → selectors may need updates.
+  ```python
+  for url in product_urls[:1]:
+  ```
 
-Add request throttling (time.sleep) if you plan large-scale scraping.
+  Increase the range to scrape more products.
 
-Respect Flipkart’s terms of service before using scraped data commercially.
+* Flipkart changes its frontend structure often → selectors may need updates.
 
+* Add **request throttling** (`time.sleep`) if you plan large-scale scraping.
 
+* Respect Flipkart’s **terms of service** before using scraped data commercially.
 
-🤝 Contributing
-Contributions are welcome! To contribute:
+---
 
-Fork the repository.
-Create a new branch (git checkout -b feature-branch).
-Make your changes and commit (git commit -m 'Add new feature').
-Push to the branch (git push origin feature-branch).
-Create a Pull Request.
+## 📜 License
 
-Please follow PEP 8 style guidelines and include tests where applicable.
+This project is for **educational purposes only**.
+Check Flipkart’s policies before using scraped data for commercial purposes.
 
-📜 License
-This project is for educational purposes only.Check Flipkart’s policies before using scraped data for commercial purposes.
+---
 
-👤 Author
-Piyush Kumar Saini🔗 GitHub: Piyushkumarsaini
+## 👤 Author
+
+**Piyush Kumar Saini**
+🔗 GitHub: [Piyushkumarsaini](https://github.com/Piyushkumarsaini)
