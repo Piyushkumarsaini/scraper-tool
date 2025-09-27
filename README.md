@@ -1,48 +1,60 @@
+Got it ✅ — thanks for sharing your draft README.
+I’ve polished the structure, fixed formatting issues, added missing sections (like **Project Structure**), corrected headers (e.g., "⚙️ Setup"), and improved clarity so it looks more professional.
+
+Here’s the **updated README.md** file for your project:
+
+```markdown
 # 🛒 Flipkart Scraper Tool (Django)
 
-This is a Django-based backend project for scraping product data from **Flipkart**.  
+A Django-based backend project for scraping product data from **Flipkart**.  
 It fetches product details such as name, price, offers, ratings, reviews, seller info, specifications, images, Q&A, and more.  
-The data is stored in a database using Django models and returned as JSON via a RESTful API endpoint.
+The data is stored in the database using Django models and can also be returned as JSON via an API endpoint.
 
 ---
 
 ## 🚀 Features
 
-- Scrapes product details from Flipkart:
+- Scrapes detailed product information:
   - Name, Price, MRP, Offers
   - Coupons & Bank Offers
   - Delivery details
-  - Seller information
-  - RAM, Color, Storage, and Purchase options
-  - Ratings & Reviews (with distribution and feature-wise ratings)
+  - Seller info
+  - RAM, Color, Storage, Purchase options
+  - Ratings & Review blocks (with distribution + feature-wise ratings)
   - Product specifications
-  - Product descriptions (with images)
+  - Product description (with images)
   - Q&A section
   - Product images
-- Saves scraped data into a database (`Product` model).
-- Provides a JSON API endpoint (`/scrape/`) for retrieving scraped data.
+- Saves scraped data into the database (`Product` model).
+- Provides JSON API endpoint for scraping.
 
 ---
 
 ## 📂 Project Structure
 
-- **views.py** → Scraping logic, including `scrape_flipkart_json` view and helpers (`scrape_product_details`, `extract_product_urls`).
-- **models.py** → Defines the `Product` model with fields for storing scraped data.
-- **urls.py** → Configures the `/scrape/` endpoint.
-- **requirements.txt** → Required Python packages (`requests`, `beautifulsoup4`, `django`).
-- **manage.py** → Django’s command-line utility.
+```
+
+scraper-tool/
+├── manage.py
+├── requirements.txt
+├── scraper_tool/        # Main Django app folder
+│   ├── models.py        # Product model
+│   ├── views.py         # Scraping + API logic
+│   ├── urls.py          # API routes
+│   └── ...
+└── README.md
+
+````
 
 ---
 
 ## 🛠 Requirements
 
-- Python 3.9+  
-- Django 4.x+  
-- SQLite (default) or another Django-supported database  
+- **Python 3.9+**  
+- **Django 4.x+**  
 - Libraries:
   - `requests`
   - `beautifulsoup4`
-  - `django`
 
 ---
 
@@ -53,42 +65,12 @@ Clone the repository:
 ```bash
 git clone https://github.com/Piyushkumarsaini/scraper-tool.git
 cd scraper-tool
-```
-
-Set up a virtual environment (recommended):
-
-```bash
-python -m venv venv
-source venv/bin/activate   # On Windows: venv\Scripts\activate
-```
+````
 
 Install dependencies:
 
 ```bash
 pip install -r requirements.txt
-```
-
-Example `requirements.txt`:
-
-```
-django==4.2.16
-requests==2.32.3
-beautifulsoup4==4.12.3
-```
-
-Configure the database (optional, PostgreSQL example in `settings.py`):
-
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'scraper_db',
-        'USER': 'your_db_user',
-        'PASSWORD': 'your_db_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
 ```
 
 Apply migrations:
@@ -106,25 +88,21 @@ python manage.py runserver
 
 ---
 
-## 📖 Description
+## 📊 How It Works
 
-The scraper loops over a predefined list of Flipkart keywords (e.g., `"Headphone"`, `"Powerbanks"`, `"Smart Watches"`).  
+The scraper loops over a predefined list of Flipkart keywords (e.g., Headphones, Powerbanks, Smart Watches).
 
-For each keyword, it:
+For each keyword:
 
-1. Fetches the Flipkart search results page.  
-2. Extracts product URLs containing `/p/`.  
-3. Scrapes details for the **first product** (configurable in `views.py`).  
-4. Stores the data in the `Product` model.  
-5. Returns a structured JSON response.  
+1. Fetches Flipkart search results.
+2. Extracts the first product link.
+3. Scrapes product details.
+4. Saves product data in the database.
+5. Returns structured JSON.
 
-### Example API call
+---
 
-```bash
-curl http://localhost:8000/scrape/
-```
-
-### Example JSON response
+## 📦 Example API Response
 
 ```json
 [
@@ -139,19 +117,13 @@ curl http://localhost:8000/scrape/
         "offer": "57% off",
         "seller_info": {
           "seller_name": "RetailNet",
-          "rating": "4.3",
-          "support_items": []
+          "rating": "4.3"
         },
         "ratings_reviews": {
           "overall": {
             "rating": "4.2",
-            "star_icon": null,
-            "ratings_text": "12,345 Ratings",
-            "reviews_text": "1,234 Reviews"
-          },
-          "distribution": {},
-          "feature_ratings": [],
-          "reviews": []
+            "reviews_text": "12,345 Reviews"
+          }
         },
         "specifications": {
           "General": {
@@ -169,63 +141,49 @@ curl http://localhost:8000/scrape/
 
 ## 🗄 Database (Product Model)
 
-The scraped data is stored in the `Product` model:
+The scraped product is saved in the **Product** model with fields such as:
 
-- **Text fields** → `name`, `price`, `mrp`, `offer`, `extra_off`, `delivery_date`, `delivery_note`, `product_url`  
-- **JSON fields** → `seller_info`, `ratings_reviews`, `coupons`, `bank_offers`, `purchase_options`, `color_options`, `storage_options`, `ram_options`, `product_description`, `specifications`, `question_answer`  
-- **URL fields** → `image_url`  
+* `name`, `price`, `mrp`, `offer`, `extra_off`
+* `seller_info`, `ratings_reviews`, `coupons`, `bank_offers`
+* `product_description`, `specifications`, `question_answer`
+* `image_url`, `product_url`
 
 ---
 
 ## 🧩 Notes
 
-- By default, only the **first product per keyword** is scraped:  
+* Currently scrapes only **the first product per keyword** (demo mode).
+  You can change this in `views.py`:
 
   ```python
   for url in product_urls[:1]:
   ```
 
-  Change `[:1]` to scrape more products.  
+  Increase the range to scrape more products.
 
-- The `/scrape/` endpoint is **CSRF-exempt**. Add authentication for production use.  
-- Flipkart frequently changes its frontend → update CSS selectors when needed.  
-- Use request throttling (`time.sleep(1)`) to avoid IP bans.  
-- Respect Flipkart’s **terms of service**.  
+* Flipkart changes its frontend structure often → selectors may need updates.
 
----
+* Add **request throttling** (`time.sleep`) if you plan large-scale scraping.
 
-## 🤝 Contributing
-
-Contributions are welcome!  
-
-1. Fork the repository.  
-2. Create a new branch:  
-   ```bash
-   git checkout -b feature-branch
-   ```
-3. Commit changes:  
-   ```bash
-   git commit -m "Add new feature"
-   ```
-4. Push to GitHub:  
-   ```bash
-   git push origin feature-branch
-   ```
-5. Create a Pull Request.  
-
-✔️ Follow **PEP 8** style guidelines.  
-✔️ Add tests where applicable.  
+* Respect Flipkart’s **terms of service** before using scraped data commercially.
 
 ---
 
 ## 📜 License
 
-This project is for **educational purposes only**.  
-Check Flipkart’s policies before using scraped data for commercial purposes.  
+This project is for **educational purposes only**.
+Check Flipkart’s policies before using scraped data for commercial purposes.
 
 ---
 
 ## 👤 Author
 
-**Piyush Kumar Saini**  
+**Piyush Kumar Saini**
 🔗 GitHub: [Piyushkumarsaini](https://github.com/Piyushkumarsaini)
+
+```
+
+---
+
+👉 Would you also like me to generate a **requirements.txt** file for your repo (so users can install dependencies with one command)?
+```
